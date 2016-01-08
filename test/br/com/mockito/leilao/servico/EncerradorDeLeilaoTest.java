@@ -12,6 +12,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -40,5 +41,24 @@ public class EncerradorDeLeilaoTest {
 
         assertTrue(leilao1.isEncerrado());
         assertTrue(leilao2.isEncerrado());
+    }
+
+    @Test
+    public void deveAtualizarLeiloesEncerrados() {
+
+        Calendar antiga = Calendar.getInstance();
+        antiga.set(1999, 1, 20);
+
+        Leilao leilao1 = new CriadorDeLeilao().para("TV de plasma")
+                .naData(antiga).constroi();
+
+        LeilaoDao daoFalso = mock(LeilaoDao.class);
+        when(daoFalso.correntes()).thenReturn(Arrays.asList(leilao1));
+
+        EncerradorDeLeilao encerrador = new EncerradorDeLeilao();
+        encerrador.encerra();
+
+        // verificando que o metodo atualiza foi realmente invocado!
+        verify(daoFalso).atualiza(leilao1);
     }
 }
